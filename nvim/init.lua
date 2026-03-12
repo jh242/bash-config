@@ -45,6 +45,7 @@ require("lazy").setup({
   -- Treesitter
   {
     "nvim-treesitter/nvim-treesitter",
+    version = false, -- last release is way too old
     lazy = false,
     build = ":TSUpdate",
     opts = {
