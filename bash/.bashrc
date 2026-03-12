@@ -24,7 +24,10 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
 # Aliases
-alias ll='ls -alF'
+alias ll='ls -l'
+alias c='clear -x'
+alias vim='nvim'
+alias vi='nvim'
 alias la='ls -A'
 alias l='ls -CF'
 alias ..='cd ..'
@@ -33,6 +36,9 @@ alias gs='git status'
 alias ga='git add'
 alias gc='git commit'
 alias gp='git push'
+
+# Initialize Starship
+eval "$(starship init bash)"
 
 # Environment variables
 export EDITOR='nvim'
