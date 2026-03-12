@@ -83,6 +83,9 @@ link_file "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
 # Git
 link_file "$DOTFILES_DIR/git/.gitconfig" "$HOME/.gitconfig"
 
+# Ripgrep
+link_file "$DOTFILES_DIR/rg/.ripgreprc" "$HOME/.ripgreprc"
+
 echo "Installation complete!"
 echo "Please restart your shell or run: source ~/.bashrc"
 echo "Note: If NVM was installed, you may need to restart your terminal."

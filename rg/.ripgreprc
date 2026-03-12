@@ -1,0 +1,10 @@
+--column
+--line-number
+--no-heading
+--fixed-strings
+--ignore-case
+--hidden
+--follow
+--glob=!.git/*
+--color=always
+--pager=delta --color-only

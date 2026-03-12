@@ -42,6 +42,14 @@ if command -v fdfind &> /dev/null; then
     alias fd='fdfind'
 fi
 
+# Ripgrep configuration
+export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
+
+# Use delta as pager for fd (when outputting to a TTY)
+if command -v fd &> /dev/null || command -v fdfind &> /dev/null; then
+    alias fd-delta='fd --color=always | delta'
+fi
+
 # Initialize Starship
 eval "$(starship init bash)"
 
