@@ -46,7 +46,37 @@ require("lazy").setup({
   { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
 
   -- LSP and Autocompletion
-  { "neovim/nvim-lspconfig" },
+  {
+    "williamboman/mason.nvim",
+    build = ":MasonUpdate",
+    opts = {},
+  },
+  {
+    "williamboman/mason-lspconfig.nvim",
+    dependencies = { "williamboman/mason.nvim" },
+    opts = {
+      ensure_installed = { "pyright", "clangd", "vtsls" },
+    },
+  },
+  {
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    dependencies = { "williamboman/mason.nvim" },
+    opts = {
+      ensure_installed = { "prettier", "black" },
+    },
+  },
+  {
+    "neovim/nvim-lspconfig",
+    dependencies = { "williamboman/mason-lspconfig.nvim" },
+    config = function()
+      local lspconfig = require("lspconfig")
+      local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
+      lspconfig.pyright.setup({ capabilities = capabilities })
+      lspconfig.clangd.setup({ capabilities = capabilities })
+      lspconfig.vtsls.setup({ capabilities = capabilities })
+    end
+  },
   { "hrsh7th/nvim-cmp", dependencies = { "hrsh7th/cmp-nvim-lsp", "L3MON4D3/LuaSnip" } },
 
   -- Git integration

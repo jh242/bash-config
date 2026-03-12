@@ -25,17 +25,13 @@ install_dependencies() {
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         fi
         brew install git neovim tmux starship nvm git-delta ripgrep fd
-        # Formatters
-        brew install prettier black clang-format
+        # Dev Tools & Formatters
+        brew install node python3 cmake clang-format black prettier
     elif [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ]; then
         sudo apt-get update
         sudo apt-get install -y git tmux curl git-delta ripgrep fd-find
-        # Formatters
-        sudo apt-get install -y python3-black clang-format
-        # Prettier via npm (if node is available)
-        if command -v npm &> /dev/null; then
-            sudo npm install -g prettier
-        fi
+        # Dev Tools & Formatters
+        sudo apt-get install -y python3 python3-pip python3-venv build-essential cmake g++ clangd clang-format
         
         # Install latest Neovim AppImage for Linux (extracted for FUSE compatibility)
         echo "Installing Neovim AppImage..."
@@ -59,6 +55,9 @@ install_dependencies() {
         # Install NVM
         if [ ! -d "$HOME/.nvm" ]; then
             curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install --lts
         fi
     else
         echo "Unsupported OS/Distro for automatic dependency installation. Please install git, neovim, tmux, starship, and nvm manually."
