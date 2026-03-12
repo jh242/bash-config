@@ -45,7 +45,7 @@ require("lazy").setup({
   -- Treesitter
   {
     "nvim-treesitter/nvim-treesitter",
-    version = false, -- last release is way too old and doesn't work on Windows
+    lazy = false,
     build = ":TSUpdate",
     opts = {
       ensure_installed = { "lua", "vim", "vimdoc", "query", "python", "typescript", "cpp", "bash" },
@@ -79,20 +79,16 @@ require("lazy").setup({
   },
   {
     "neovim/nvim-lspconfig",
+    -- Pin to a version that doesn't warn on 0.11, or use the stable branch
+    version = "v0.1.x", 
     dependencies = { "williamboman/mason-lspconfig.nvim" },
     config = function()
+      local lspconfig = require("lspconfig")
       local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
-      -- Neovim 0.11+ style if available, otherwise fallback to traditional
-      if vim.lsp.config then
-        vim.lsp.config('*', { capabilities = capabilities })
-        vim.lsp.enable({ 'pyright', 'clangd', 'vtsls' })
-      else
-        local lspconfig = require("lspconfig")
-        lspconfig.pyright.setup({ capabilities = capabilities })
-        lspconfig.clangd.setup({ capabilities = capabilities })
-        lspconfig.vtsls.setup({ capabilities = capabilities })
-      end
+      lspconfig.pyright.setup({ capabilities = capabilities })
+      lspconfig.clangd.setup({ capabilities = capabilities })
+      lspconfig.vtsls.setup({ capabilities = capabilities })
     end
   },
   { "hrsh7th/nvim-cmp", dependencies = { "hrsh7th/cmp-nvim-lsp", "L3MON4D3/LuaSnip" } },

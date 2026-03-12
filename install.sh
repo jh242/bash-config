@@ -29,7 +29,7 @@ install_dependencies() {
         brew install node python3 cmake clang-format black prettier
     elif [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ]; then
         sudo apt-get update
-        sudo apt-get install -y git tmux curl git-delta ripgrep fd-find
+        sudo apt-get install -y git tmux curl wget unzip tar gzip git-delta ripgrep fd-find
         # Dev Tools & Formatters
         sudo apt-get install -y python3 python3-pip python3-venv build-essential cmake g++ clangd clang-format
         
