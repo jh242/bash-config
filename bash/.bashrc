@@ -37,6 +37,11 @@ alias ga='git add'
 alias gc='git commit'
 alias gp='git push'
 
+# Modern CLI tools
+if command -v fdfind &> /dev/null; then
+    alias fd='fdfind'
+fi
+
 # Initialize Starship
 eval "$(starship init bash)"
 

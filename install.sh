@@ -24,10 +24,10 @@ install_dependencies() {
             echo "Homebrew not found. Installing Homebrew..."
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         fi
-        brew install git neovim tmux starship nvm
+        brew install git neovim tmux starship nvm git-delta ripgrep fd
     elif [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ]; then
         sudo apt-get update
-        sudo apt-get install -y git neovim tmux curl
+        sudo apt-get install -y git neovim tmux curl git-delta ripgrep fd-find
         
         # Install Starship
         if ! command -v starship &> /dev/null; then

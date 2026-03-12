@@ -7,6 +7,7 @@ A sensible configuration for Bash, Neovim, and Tmux.
 - **Bash**: Sensible aliases, colored prompt, and local config support.
 - **Neovim**: Plugin-ready configuration with `lazy.nvim`, Telescope, Treesitter, and Gruvbox.
 - **Tmux**: Ergonomic prefix (`C-a`), mouse support, and pane navigation shortcuts.
+- **Tools**: Automated installation of `starship`, `nvm`, `git-delta` (rich git diffs), `ripgrep` (`rg`), and `fd`.
 
 ## Prerequisites
 
