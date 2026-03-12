@@ -26,6 +26,7 @@ install_dependencies() {
         fi
         # Install common tools and Starship
         brew install git neovim tmux starship nvm git-delta ripgrep fd
+        mkdir -p "$HOME/.nvm"
         # Dev Tools & Formatters
         brew install node python3 cmake clang-format black prettier
     elif [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ]; then

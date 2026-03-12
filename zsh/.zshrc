@@ -12,6 +12,7 @@ setopt SHARE_HISTORY
 bindkey -e
 
 # LS colors
+export CLICOLOR=1
 if [[ "$OSTYPE" == "darwin"* ]]; then
     export LSCOLORS="Gxfxcxdxbxegedabagacad"
     alias ls='ls -G'
@@ -46,8 +47,15 @@ fi
 
 # NVM
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# MacOS (Homebrew)
+if [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
+    . "/opt/homebrew/opt/nvm/nvm.sh"
+    [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+# Linux / Standard
+elif [ -s "$NVM_DIR/nvm.sh" ]; then
+    . "$NVM_DIR/nvm.sh"
+    [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+fi
 
 # Environment variables
 export EDITOR='nvim'

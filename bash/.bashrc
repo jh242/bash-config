@@ -16,6 +16,7 @@ fi
 unset color_prompt force_color_prompt
 
 # LS colors
+export CLICOLOR=1
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
@@ -48,6 +49,18 @@ export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
 # Use delta as pager for fd (when outputting to a TTY)
 if command -v fd &> /dev/null || command -v fdfind &> /dev/null; then
     alias fd-delta='fd --color=always | delta'
+fi
+
+# NVM
+export NVM_DIR="$HOME/.nvm"
+# MacOS (Homebrew)
+if [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
+    . "/opt/homebrew/opt/nvm/nvm.sh"
+    [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+# Linux / Standard
+elif [ -s "$NVM_DIR/nvm.sh" ]; then
+    . "$NVM_DIR/nvm.sh"
+    [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
 fi
 
 # Initialize Starship
