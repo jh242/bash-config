@@ -80,27 +80,10 @@ install_fonts() {
 
     mkdir -p "$font_dir"
 
-    # Try to find it in Windows Downloads if in WSL
-    local wsl_downloads=""
-    if grep -q Microsoft /proc/version 2>/dev/null || grep -q microsoft /proc/version 2>/dev/null; then
-        local win_home=$(cmd.exe /c "echo %USERPROFILE%" 2>/dev/null | sed 's/\r//')
-        if [ -n "$win_home" ]; then
-            wsl_downloads=$(wslpath "$win_home")/Downloads
-        fi
-    fi
-
-    if [ -n "$wsl_downloads" ] && [ -d "$wsl_downloads/$font_name" ]; then
-        echo "Found $font_name in Windows Downloads. Copying..."
-        cp "$wsl_downloads/$font_name"/*.ttf "$font_dir/" 2>/dev/null || cp "$wsl_downloads/$font_name"/*.otf "$font_dir/" 2>/dev/null
-    elif [ -n "$wsl_downloads" ] && [ -f "$wsl_downloads/$zip_file" ]; then
-        echo "Found $zip_file in Windows Downloads. Extracting..."
-        unzip -o "$wsl_downloads/$zip_file" -d "$font_dir/"
-    else
-        echo "Downloading $font_name Nerd Font from GitHub..."
-        curl -LO "$download_url"
-        unzip -o "$zip_file" -d "$font_dir/"
-        rm "$zip_file"
-    fi
+    echo "Downloading $font_name Nerd Font from GitHub..."
+    curl -LO "$download_url"
+    unzip -o "$zip_file" -d "$font_dir/"
+    rm "$zip_file"
 
     if [ "$OS" != "Darwin" ]; then
         fc-cache -fv "$font_dir"
