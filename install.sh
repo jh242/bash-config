@@ -29,12 +29,19 @@ install_dependencies() {
         sudo apt-get update
         sudo apt-get install -y git tmux curl git-delta ripgrep fd-find
         
-        # Install latest Neovim AppImage for Linux
+        # Install latest Neovim AppImage for Linux (extracted for FUSE compatibility)
         echo "Installing Neovim AppImage..."
         mkdir -p "$HOME/.local/bin"
+        mkdir -p "$HOME/.local/lib"
         curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
         chmod +x nvim-linux-x86_64.appimage
-        mv nvim-linux-x86_64.appimage "$HOME/.local/bin/nvim"
+        
+        # Extract the AppImage to avoid FUSE dependency issues (common in WSL/Containers)
+        ./nvim-linux-x86_64.appimage --appimage-extract > /dev/null
+        rm -rf "$HOME/.local/lib/nvim-appimage"
+        mv squashfs-root "$HOME/.local/lib/nvim-appimage"
+        ln -sf "$HOME/.local/lib/nvim-appimage/AppRun" "$HOME/.local/bin/nvim"
+        rm nvim-linux-x86_64.appimage
 
         # Install Starship
         if ! command -v starship &> /dev/null; then
