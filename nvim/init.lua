@@ -51,15 +51,7 @@ require("lazy").setup({
 
   -- Git integration
   { "lewis6991/gitsigns.nvim", opts = {} },
-  {
-    "NeogitOrg/neogit",
-    dependencies = {
-      "nvim-lua/plenary.nvim",         -- required
-      "sindrets/diffview.nvim",        -- optional - Diff integration
-      "nvim-telescope/telescope.nvim", -- optional
-    },
-    config = true
-  },
+  { "f-person/gitblame.nvim", opts = { enabled = true } },
 
   -- System Clipboard (WSL/Local/SSH)
   {
@@ -83,4 +75,4 @@ local keymap = vim.keymap
 keymap.set('n', '<leader>ff', '<cmd>Telescope find_files<cr>', { desc = 'Find files' })
 keymap.set('n', '<leader>fg', '<cmd>Telescope live_grep<cr>', { desc = 'Live grep' })
 keymap.set('n', '<leader>e', '<cmd>Ex<cr>', { desc = 'Explorer' })
-keymap.set('n', '<leader>gs', '<cmd>Neogit<cr>', { desc = 'Git status (Neogit)' })
+keymap.set('n', '<leader>gb', '<cmd>GitBlameToggle<cr>', { desc = 'Toggle Git Blame' })
