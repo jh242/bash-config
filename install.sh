@@ -25,9 +25,17 @@ install_dependencies() {
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         fi
         brew install git neovim tmux starship nvm git-delta ripgrep fd
+        # Formatters
+        brew install prettier black clang-format
     elif [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ]; then
         sudo apt-get update
         sudo apt-get install -y git tmux curl git-delta ripgrep fd-find
+        # Formatters
+        sudo apt-get install -y python3-black clang-format
+        # Prettier via npm (if node is available)
+        if command -v npm &> /dev/null; then
+            sudo npm install -g prettier
+        fi
         
         # Install latest Neovim AppImage for Linux (extracted for FUSE compatibility)
         echo "Installing Neovim AppImage..."
