@@ -79,16 +79,18 @@ require("lazy").setup({
   },
   {
     "neovim/nvim-lspconfig",
-    -- Pin to a version that doesn't warn on 0.11, or use the stable branch
-    version = "v0.1.x", 
     dependencies = { "williamboman/mason-lspconfig.nvim" },
     config = function()
-      local lspconfig = require("lspconfig")
       local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
-      lspconfig.pyright.setup({ capabilities = capabilities })
-      lspconfig.clangd.setup({ capabilities = capabilities })
-      lspconfig.vtsls.setup({ capabilities = capabilities })
+      -- Neovim 0.11+ Native LSP Configuration
+      local servers = { 'pyright', 'clangd', 'vtsls' }
+      for _, server in ipairs(servers) do
+        vim.lsp.config(server, {
+          capabilities = capabilities,
+        })
+        vim.lsp.enable(server)
+      end
     end
   },
   { "hrsh7th/nvim-cmp", dependencies = { "hrsh7th/cmp-nvim-lsp", "L3MON4D3/LuaSnip" } },
