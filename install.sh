@@ -25,10 +25,31 @@ install_dependencies() {
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         fi
         # Install common tools and Starship
-        brew install git neovim tmux starship nvm git-delta ripgrep fd
-        mkdir -p "$HOME/.nvm"
+        brew install git neovim tmux starship git-delta ripgrep fd
+        
+        # Install NVM via the standard path
+        if [ ! -d "$HOME/.nvm" ]; then
+            echo "Installing NVM via official script..."
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+        fi
+
+        # Setup NVM and Install Node LTS
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        
+        if command -v nvm &> /dev/null; then
+            echo "Installing and using Node.js LTS via NVM..."
+            nvm install --lts
+            nvm use --lts
+            nvm alias default 'lts/*'
+            
+            # Install global npm packages (now that node is available)
+            echo "Installing global npm packages..."
+            npm install -g prettier
+        fi
+
         # Dev Tools & Formatters
-        brew install node python3 cmake clang-format black prettier
+        brew install python3 cmake clang-format black
     elif [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ]; then
         sudo apt-get update
         sudo apt-get install -y zsh git tmux curl wget unzip tar gzip git-delta ripgrep fd-find
@@ -57,9 +78,20 @@ install_dependencies() {
         # Install NVM
         if [ ! -d "$HOME/.nvm" ]; then
             curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        fi
+        
+        # Setup NVM and Install Node LTS
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        if command -v nvm &> /dev/null; then
+            echo "Installing and using Node.js LTS via NVM..."
             nvm install --lts
+            nvm use --lts
+            nvm alias default 'lts/*'
+
+            # Install global npm packages (now that node is available)
+            echo "Installing global npm packages..."
+            npm install -g prettier
         fi
     else
         echo "Unsupported OS/Distro for automatic dependency installation. Please install git, neovim, tmux, starship, and nvm manually."
