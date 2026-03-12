@@ -24,12 +24,13 @@ install_dependencies() {
             echo "Homebrew not found. Installing Homebrew..."
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         fi
+        # Install common tools and Starship
         brew install git neovim tmux starship nvm git-delta ripgrep fd
         # Dev Tools & Formatters
         brew install node python3 cmake clang-format black prettier
     elif [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ]; then
         sudo apt-get update
-        sudo apt-get install -y git tmux curl wget unzip tar gzip git-delta ripgrep fd-find
+        sudo apt-get install -y zsh git tmux curl wget unzip tar gzip git-delta ripgrep fd-find
         # Dev Tools & Formatters
         sudo apt-get install -y python3 python3-pip python3-venv build-essential cmake g++ clangd clang-format
         
@@ -146,8 +147,15 @@ fi
 
 echo "Installing dotfiles configurations..."
 
-# Bash
-link_file "$DOTFILES_DIR/bash/.bashrc" "$HOME/.bashrc"
+# Shell configuration
+if [ "$OS" == "Darwin" ]; then
+    echo "Configuring Zsh for MacOS..."
+    link_file "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
+else
+    echo "Configuring Bash and Zsh for Linux..."
+    link_file "$DOTFILES_DIR/bash/.bashrc" "$HOME/.bashrc"
+    link_file "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
+fi
 
 # Neovim
 link_file "$DOTFILES_DIR/nvim/init.lua" "$HOME/.config/nvim/init.lua"
@@ -162,5 +170,9 @@ link_file "$DOTFILES_DIR/git/.gitconfig" "$HOME/.gitconfig"
 link_file "$DOTFILES_DIR/rg/.ripgreprc" "$HOME/.ripgreprc"
 
 echo "Installation complete!"
-echo "Please restart your shell or run: source ~/.bashrc"
+if [ "$OS" == "Darwin" ]; then
+    echo "Please restart your terminal or run: source ~/.zshrc"
+else
+    echo "Please restart your terminal or run: source ~/.bashrc (or ~/.zshrc if using zsh)"
+fi
 echo "Note: If NVM was installed, you may need to restart your terminal."
