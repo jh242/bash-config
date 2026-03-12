@@ -45,13 +45,15 @@ require("lazy").setup({
   -- Treesitter
   {
     "nvim-treesitter/nvim-treesitter",
+    version = false, -- last release is way too old and doesn't work on Windows
     build = ":TSUpdate",
-    config = function()
-      require('nvim-treesitter.configs').setup({
-        ensure_installed = { "lua", "vim", "vimdoc", "query", "python", "typescript", "cpp", "bash" },
-        highlight = { enable = true },
-        indent = { enable = true },
-      })
+    opts = {
+      ensure_installed = { "lua", "vim", "vimdoc", "query", "python", "typescript", "cpp", "bash" },
+      highlight = { enable = true },
+      indent = { enable = true },
+    },
+    config = function(_, opts)
+      require('nvim-treesitter.configs').setup(opts)
     end
   },
 
