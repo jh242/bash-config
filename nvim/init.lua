@@ -43,7 +43,17 @@ require("lazy").setup({
   { "nvim-telescope/telescope.nvim", branch = "0.1.x", dependencies = { "nvim-lua/plenary.nvim" } },
 
   -- Treesitter
-  { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
+  {
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
+    config = function()
+      require('nvim-treesitter.configs').setup({
+        ensure_installed = { "lua", "vim", "vimdoc", "query", "python", "typescript", "cpp", "bash" },
+        highlight = { enable = true },
+        indent = { enable = true },
+      })
+    end
+  },
 
   -- LSP and Autocompletion
   {
@@ -69,12 +79,18 @@ require("lazy").setup({
     "neovim/nvim-lspconfig",
     dependencies = { "williamboman/mason-lspconfig.nvim" },
     config = function()
-      local lspconfig = require("lspconfig")
       local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
-      lspconfig.pyright.setup({ capabilities = capabilities })
-      lspconfig.clangd.setup({ capabilities = capabilities })
-      lspconfig.vtsls.setup({ capabilities = capabilities })
+      -- Neovim 0.11+ style if available, otherwise fallback to traditional
+      if vim.lsp.config then
+        vim.lsp.config('*', { capabilities = capabilities })
+        vim.lsp.enable({ 'pyright', 'clangd', 'vtsls' })
+      else
+        local lspconfig = require("lspconfig")
+        lspconfig.pyright.setup({ capabilities = capabilities })
+        lspconfig.clangd.setup({ capabilities = capabilities })
+        lspconfig.vtsls.setup({ capabilities = capabilities })
+      end
     end
   },
   { "hrsh7th/nvim-cmp", dependencies = { "hrsh7th/cmp-nvim-lsp", "L3MON4D3/LuaSnip" } },
