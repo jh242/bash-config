@@ -72,6 +72,26 @@ install_fonts() {
     local download_url="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/${zip_file}"
     local font_dir=""
 
+    # Detect if we are in WSL
+    if grep -qi microsoft /proc/version 2>/dev/null; then
+        echo "WSL detected. Downloading to Windows Downloads folder for manual installation..."
+        local win_home=$(cmd.exe /c "echo %USERPROFILE%" 2>/dev/null | sed 's/\r//')
+        if [ -n "$win_home" ]; then
+            local win_downloads=$(wslpath "$win_home")/Downloads
+            mkdir -p "$win_downloads/$font_name"
+            echo "Downloading $font_name Nerd Font to $win_downloads/$font_name..."
+            curl -L "$download_url" -o "$win_downloads/$zip_file"
+            unzip -o "$win_downloads/$zip_file" -d "$win_downloads/$font_name/"
+            rm "$win_downloads/$zip_file"
+            echo "--------------------------------------------------------------------------------"
+            echo "Font downloaded and extracted to: $win_downloads\\$font_name"
+            echo "ACTION REQUIRED: Please go to that folder in Windows, right-click the .ttf"
+            echo "files, and select 'Install' to make them available to your terminal."
+            echo "--------------------------------------------------------------------------------"
+            return
+        fi
+    fi
+
     if [ "$OS" == "Darwin" ]; then
         font_dir="$HOME/Library/Fonts"
     else
