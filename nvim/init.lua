@@ -53,6 +53,9 @@ require("lazy").setup({
   { "lewis6991/gitsigns.nvim", opts = {} },
   { "f-person/git-blame.nvim", opts = { enabled = true } },
 
+  -- Formatter
+  { "sbdchd/neoformat" },
+
   -- System Clipboard (WSL/Local/SSH)
   {
     "ojroques/nvim-osc52",
@@ -76,3 +79,4 @@ keymap.set('n', '<leader>ff', '<cmd>Telescope find_files<cr>', { desc = 'Find fi
 keymap.set('n', '<leader>fg', '<cmd>Telescope live_grep<cr>', { desc = 'Live grep' })
 keymap.set('n', '<leader>e', '<cmd>Ex<cr>', { desc = 'Explorer' })
 keymap.set('n', '<leader>gb', '<cmd>GitBlameToggle<cr>', { desc = 'Toggle Git Blame' })
+keymap.set('n', '<leader>f', '<cmd>Neoformat<cr>', { desc = 'Format code' })
