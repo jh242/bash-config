@@ -8,6 +8,7 @@ A sensible configuration for Bash, Neovim, and Tmux.
 - **Neovim**: Plugin-ready configuration with `lazy.nvim`, Telescope, Treesitter, and Gruvbox.
 - **Tmux**: Ergonomic prefix (`C-a`), mouse support, and custom shortcuts.
 - **Tools**: Automated installation of `starship`, `nvm`, `git-delta` (rich git diffs), `ripgrep` (`rg`), and `fd`.
+- **Fonts**: Automated installation of **Geist Mono Nerd Font** (required for the icons in Starship, Lualine, etc.).
 
 ## Prerequisites
 
