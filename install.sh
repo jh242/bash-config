@@ -27,8 +27,15 @@ install_dependencies() {
         brew install git neovim tmux starship nvm git-delta ripgrep fd
     elif [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ]; then
         sudo apt-get update
-        sudo apt-get install -y git neovim tmux curl git-delta ripgrep fd-find
+        sudo apt-get install -y git tmux curl git-delta ripgrep fd-find
         
+        # Install latest Neovim AppImage for Linux
+        echo "Installing Neovim AppImage..."
+        mkdir -p "$HOME/.local/bin"
+        curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
+        chmod +x nvim-linux-x86_64.appimage
+        mv nvim-linux-x86_64.appimage "$HOME/.local/bin/nvim"
+
         # Install Starship
         if ! command -v starship &> /dev/null; then
             curl -sS https://starship.rs/install.sh | sh -s -- -y
