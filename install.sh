@@ -80,6 +80,9 @@ link_file "$DOTFILES_DIR/nvim/init.lua" "$HOME/.config/nvim/init.lua"
 # Tmux
 link_file "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
 
+# Git
+link_file "$DOTFILES_DIR/git/.gitconfig" "$HOME/.gitconfig"
+
 echo "Installation complete!"
 echo "Please restart your shell or run: source ~/.bashrc"
 echo "Note: If NVM was installed, you may need to restart your terminal."

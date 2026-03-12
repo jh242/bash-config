@@ -1,0 +1,37 @@
+[user]
+	# name = Your Name
+	# email = your.email@example.com
+
+[alias]
+	co = checkout
+	ci = commit
+	st = status -sb
+	br = branch
+	hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+	type = cat-file -t
+	dump = cat-file -p
+
+[core]
+	editor = nvim
+	pager = delta
+
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	navigate = true    # use n and N to move between diff sections
+	light = false      # set to true if you're in a terminal with a light background color
+	side-by-side = true
+	line-numbers = true
+
+[merge]
+	conflictstyle = diff3
+
+[diff]
+	colorMoved = default
+
+[pull]
+	rebase = true
+
+[init]
+	defaultBranch = main
