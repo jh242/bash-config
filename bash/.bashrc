@@ -28,6 +28,8 @@ alias ll='ls -l'
 alias c='clear -x'
 alias vim='nvim'
 alias vi='nvim'
+alias v='nvim'
+alias view='nvim -R'
 alias la='ls -A'
 alias l='ls -CF'
 alias ..='cd ..'
@@ -55,6 +57,7 @@ eval "$(starship init bash)"
 
 # Environment variables
 export EDITOR='nvim'
+export VISUAL='nvim'
 export PATH=$HOME/bin:$HOME/.local/bin:$PATH
 
 # Source local config if it exists
