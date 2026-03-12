@@ -51,7 +51,7 @@ require("lazy").setup({
 
   -- Git integration
   { "lewis6991/gitsigns.nvim", opts = {} },
-  { "f-person/gitblame.nvim", opts = { enabled = true } },
+  { "f-person/git-blame.nvim", opts = { enabled = true } },
 
   -- System Clipboard (WSL/Local/SSH)
   {
