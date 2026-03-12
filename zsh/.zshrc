@@ -6,7 +6,8 @@ SAVEHIST=10000
 HISTFILE=~/.zsh_history
 setopt HIST_IGNORE_ALL_DUPS
 setopt HIST_REDUCE_BLANKS
-setopt SHARE_HISTORY
+unsetopt SHARE_HISTORY
+setopt APPEND_HISTORY
 
 # Key bindings
 bindkey -e
