@@ -33,10 +33,8 @@ alias la='ls -A'
 alias l='ls -CF'
 alias ..='cd ..'
 alias ...='cd ../..'
-alias gs='git status'
-alias ga='git add'
-alias gc='git commit'
-alias gp='git push'
+alias g='git'
+alias desk='ssh jhu@68.237.90.220'
 
 # Ripgrep configuration
 export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
