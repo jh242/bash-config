@@ -113,10 +113,18 @@ require("lazy").setup({
 
   -- Git integration
   { "lewis6991/gitsigns.nvim", opts = {} },
-  { "f-person/git-blame.nvim", opts = { enabled = true } },
+  { "tpope/vim-fugitive" },
 
   -- Formatter
   { "sbdchd/neoformat" },
+
+  -- Sessions
+  {
+    "rmagatti/auto-session",
+    opts = {
+      suppressed_dirs = { "~/", "~/Downloads", "/" },
+    },
+  },
 
   -- System Clipboard (WSL/Local/SSH)
   {
@@ -150,9 +158,14 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
 -- Keymaps
 local keymap = vim.keymap
+keymap.set({'n', 'v'}, 'c', '"_c')
+keymap.set({'n', 'v'}, 'C', '"_C')
 keymap.set('n', '<leader>ff', '<cmd>Telescope find_files<cr>', { desc = 'Find files' })
 keymap.set('n', '<leader>fg', '<cmd>Telescope live_grep<cr>', { desc = 'Live grep' })
 keymap.set('n', '<leader>e', '<cmd>Ex<cr>', { desc = 'Explorer' })
 keymap.set('n', '<leader>q', '<cmd>cclose<cr>', { desc = 'Close Quickfix' })
-keymap.set('n', '<leader>gb', '<cmd>GitBlameToggle<cr>', { desc = 'Toggle Git Blame' })
+keymap.set('n', '<leader>gs', '<cmd>Git<cr>', { desc = 'Git status (Fugitive)' })
+keymap.set('n', '<leader>gb', '<cmd>Git blame<cr>', { desc = 'Git blame (Fugitive)' })
+keymap.set('n', '<leader>gd', '<cmd>Gdiffsplit<cr>', { desc = 'Git diff split' })
+keymap.set('n', '<leader>gl', '<cmd>Git log --oneline<cr>', { desc = 'Git log' })
 keymap.set('n', '<leader>f', '<cmd>Neoformat<cr>', { desc = 'Format code' })
