@@ -7,4 +7,3 @@
 --follow
 --glob=!.git/*
 --color=always
---pager=delta --color-only
