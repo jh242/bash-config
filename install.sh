@@ -1,200 +1,155 @@
 #!/bin/bash
 
-# install.sh - Robust dotfiles installation script
+# install.sh - dotfiles installer for macOS and Arch Linux using zsh
 
-DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+set -e
+
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKUP_DIR="$HOME/.dotfiles_backup/$(date +%Y%m%d%H%M%S)"
 
 # --- OS Detection ---
 OS="$(uname -s)"
-case "$OS" in
-    Linux*)     DISTRO=$(lsb_release -si 2>/dev/null || cat /etc/os-release | grep ^ID= | cut -d'=' -f2 | tr -d '"') ;;
-    Darwin*)    DISTRO="MacOS" ;;
-    *)          DISTRO="Unknown" ;;
+DISTRO="Unknown"
+
+if [ "$OS" = "Darwin" ]; then
+	DISTRO="macOS"
+elif [ "$OS" = "Linux" ] && [ -r /etc/os-release ]; then
+	. /etc/os-release
+	DISTRO="${ID:-Unknown}"
+fi
+
+case "$DISTRO" in
+macOS | arch) ;;
+*)
+	echo "Unsupported OS: $OS ($DISTRO)"
+	echo "This installer supports macOS and Arch Linux with zsh."
+	exit 1
+	;;
 esac
 
 echo "Detected OS: $OS ($DISTRO)"
 
-# --- Dependency Installation ---
-install_dependencies() {
-    echo "Checking and installing dependencies..."
-    
-    if [ "$DISTRO" == "MacOS" ]; then
-        if ! command -v brew &> /dev/null; then
-            echo "Homebrew not found. Installing Homebrew..."
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        fi
-        # Install common tools and Starship
-        brew install git neovim tmux starship git-delta ripgrep fd
-        
-        # Install NVM via the standard path
-        if [ ! -d "$HOME/.nvm" ]; then
-            echo "Installing NVM via official script..."
-            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-        fi
+install_nvm_node() {
+	# Install NVM via the standard path
+	if [ ! -d "$HOME/.nvm" ]; then
+		echo "Installing NVM via official script..."
+		curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+	fi
 
-        # Setup NVM and Install Node LTS
-        export NVM_DIR="$HOME/.nvm"
-        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-        
-        if command -v nvm &> /dev/null; then
-            echo "Installing and using Node.js LTS via NVM..."
-            nvm install --lts
-            nvm use --lts
-            nvm alias default 'lts/*'
-            
-            # Install global npm packages (now that node is available)
-            echo "Installing global npm packages..."
-            npm install -g prettier
-        fi
+	# Setup NVM and Install Node LTS
+	export NVM_DIR="$HOME/.nvm"
+	[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
-        # Dev Tools & Formatters
-        brew install python3 cmake clang-format black
-    elif [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ]; then
-        sudo apt-get update
-        sudo apt-get install -y zsh git tmux curl wget unzip tar gzip git-delta ripgrep fd-find
-        # Dev Tools & Formatters
-        sudo apt-get install -y python3 python3-pip python3-venv build-essential cmake g++ clangd clang-format
-        
-        # Install latest Neovim AppImage for Linux (extracted for FUSE compatibility)
-        echo "Installing Neovim AppImage..."
-        mkdir -p "$HOME/.local/bin"
-        mkdir -p "$HOME/.local/lib"
-        curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
-        chmod +x nvim-linux-x86_64.appimage
-        
-        # Extract the AppImage to avoid FUSE dependency issues (common in WSL/Containers)
-        ./nvim-linux-x86_64.appimage --appimage-extract > /dev/null
-        rm -rf "$HOME/.local/lib/nvim-appimage"
-        mv squashfs-root "$HOME/.local/lib/nvim-appimage"
-        ln -sf "$HOME/.local/lib/nvim-appimage/AppRun" "$HOME/.local/bin/nvim"
-        rm nvim-linux-x86_64.appimage
+	if command -v nvm &>/dev/null; then
+		echo "Installing and using Node.js LTS via NVM..."
+		nvm install --lts
+		nvm use --lts
+		nvm alias default 'lts/*'
 
-        # Install Starship
-        if ! command -v starship &> /dev/null; then
-            curl -sS https://starship.rs/install.sh | sh -s -- -y
-        fi
-        
-        # Install NVM
-        if [ ! -d "$HOME/.nvm" ]; then
-            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-        fi
-        
-        # Setup NVM and Install Node LTS
-        export NVM_DIR="$HOME/.nvm"
-        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-        if command -v nvm &> /dev/null; then
-            echo "Installing and using Node.js LTS via NVM..."
-            nvm install --lts
-            nvm use --lts
-            nvm alias default 'lts/*'
-
-            # Install global npm packages (now that node is available)
-            echo "Installing global npm packages..."
-            npm install -g prettier
-        fi
-    else
-        echo "Unsupported OS/Distro for automatic dependency installation. Please install git, neovim, tmux, starship, and nvm manually."
-    fi
+		echo "Installing global npm packages..."
+		npm install -g prettier
+	fi
 }
 
-# --- Font Installation ---
-install_fonts() {
-    echo "Installing Geist Mono Nerd Font..."
-    local font_name="GeistMono"
-    local zip_file="${font_name}.zip"
-    local download_url="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/${zip_file}"
-    local font_dir=""
+# --- Dependency Installation ---
+install_dependencies() {
+	echo "Checking and installing dependencies..."
 
-    # Detect if we are in WSL
-    if grep -qi microsoft /proc/version 2>/dev/null; then
-        echo "WSL detected. Downloading to Windows Downloads folder for manual installation..."
-        local win_home=$(cmd.exe /c "echo %USERPROFILE%" 2>/dev/null | sed 's/\r//')
-        if [ -n "$win_home" ]; then
-            local win_downloads=$(wslpath "$win_home")/Downloads
-            mkdir -p "$win_downloads/$font_name"
-            echo "Downloading $font_name Nerd Font to $win_downloads/$font_name..."
-            curl -L "$download_url" -o "$win_downloads/$zip_file"
-            unzip -o "$win_downloads/$zip_file" -d "$win_downloads/$font_name/"
-            rm "$win_downloads/$zip_file"
-            echo "--------------------------------------------------------------------------------"
-            echo "Font downloaded and extracted to: $win_downloads\\$font_name"
-            echo "ACTION REQUIRED: Please go to that folder in Windows, right-click the .ttf"
-            echo "files, and select 'Install' to make them available to your terminal."
-            echo "--------------------------------------------------------------------------------"
-            return
-        fi
-    fi
+	if [ "$DISTRO" = "macOS" ]; then
+		if ! command -v brew &>/dev/null; then
+			echo "Homebrew not found. Installing Homebrew..."
+			/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+		fi
 
-    if [ "$OS" == "Darwin" ]; then
-        font_dir="$HOME/Library/Fonts"
-    else
-        font_dir="$HOME/.local/share/fonts"
-    fi
+		brew install git neovim tmux git-delta ripgrep fd zsh python3 cmake clang-format black
+	elif [ "$DISTRO" = "arch" ]; then
+		sudo pacman -Syu --needed \
+			git neovim tmux git-delta ripgrep fd zsh \
+			curl wget unzip tar gzip ca-certificates \
+			python python-pip base-devel cmake clang python-black
+	fi
 
-    mkdir -p "$font_dir"
+	install_nvm_node
+}
 
-    echo "Downloading $font_name Nerd Font from GitHub..."
-    curl -LO "$download_url"
-    unzip -o "$zip_file" -d "$font_dir/"
-    rm "$zip_file"
+# --- Oh My Zsh + Powerlevel10k ---
+install_omz_p10k() {
+	echo "Installing Oh My Zsh and Powerlevel10k..."
 
-    if [ "$OS" != "Darwin" ]; then
-        fc-cache -fv "$font_dir"
-    fi
-    echo "Font installation complete! Make sure to set your terminal font to 'GeistMono Nerd Font'."
+	# Oh My Zsh - unattended, do not chsh, do not run zsh, keep existing .zshrc
+	if [ ! -d "$HOME/.oh-my-zsh" ]; then
+		RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
+			sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+	else
+		echo "Oh My Zsh already installed."
+	fi
+
+	# Powerlevel10k theme into the custom themes directory
+	local zsh_custom="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+	local p10k_dir="$zsh_custom/themes/powerlevel10k"
+	if [ ! -d "$p10k_dir" ]; then
+		git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$p10k_dir"
+	else
+		echo "Powerlevel10k already installed; pulling latest..."
+		git -C "$p10k_dir" pull --ff-only
+	fi
 }
 
 # --- Link Files ---
 link_file() {
-    local src="$1"
-    local dest="$2"
+	local src="$1"
+	local dest="$2"
 
-    if [ -e "$dest" ] && [ ! -L "$dest" ]; then
-        echo "Backing up $dest to $BACKUP_DIR"
-        mkdir -p "$BACKUP_DIR"
-        mv "$dest" "$BACKUP_DIR/"
-    elif [ -L "$dest" ]; then
-        echo "Removing existing symlink $dest"
-        rm "$dest"
-    fi
+	if [ -e "$dest" ] && [ ! -L "$dest" ]; then
+		echo "Backing up $dest to $BACKUP_DIR"
+		mkdir -p "$BACKUP_DIR"
+		mv "$dest" "$BACKUP_DIR/"
+	elif [ -L "$dest" ]; then
+		echo "Removing existing symlink $dest"
+		rm "$dest"
+	fi
 
-    echo "Creating symlink: $dest -> $src"
-    mkdir -p "$(dirname "$dest")"
-    ln -s "$src" "$dest"
+	echo "Creating symlink: $dest -> $src"
+	mkdir -p "$(dirname "$dest")"
+	ln -s "$src" "$dest"
 }
 
 # --- Main ---
 read -p "Install dependencies? (y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    install_dependencies
+	install_dependencies
 fi
 
-# Fonts
-read -p "Install Geist Mono Nerd Font? (y/n) " -n 1 -r
+read -p "Install Oh My Zsh and Powerlevel10k? (y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    install_fonts
+	install_omz_p10k
 fi
 
 echo "Installing dotfiles configurations..."
 
-# Shell configuration
-if [ "$OS" == "Darwin" ]; then
-    echo "Configuring Zsh for MacOS..."
-    link_file "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
-else
-    echo "Configuring Bash and Zsh for Linux..."
-    link_file "$DOTFILES_DIR/bash/.bashrc" "$HOME/.bashrc"
-    link_file "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
-fi
+# Zsh
+link_file "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
+link_file "$DOTFILES_DIR/zsh/.p10k.zsh" "$HOME/.p10k.zsh"
 
 # Neovim
 link_file "$DOTFILES_DIR/nvim/init.lua" "$HOME/.config/nvim/init.lua"
 
 # Tmux
 link_file "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
+
+# Tmux plugin manager (tpm) — needed for tmux-cpu and other plugins
+TPM_DIR="$HOME/.tmux/plugins/tpm"
+if [ ! -d "$TPM_DIR" ]; then
+	echo "Installing tpm..."
+	git clone --depth=1 https://github.com/tmux-plugins/tpm "$TPM_DIR"
+else
+	echo "tpm already installed; pulling latest..."
+	git -C "$TPM_DIR" pull --ff-only
+fi
+# Install declared plugins headlessly
+"$TPM_DIR/bin/install_plugins" >/dev/null 2>&1 || true
 
 # Git
 link_file "$DOTFILES_DIR/git/.gitconfig" "$HOME/.gitconfig"
@@ -203,9 +158,5 @@ link_file "$DOTFILES_DIR/git/.gitconfig" "$HOME/.gitconfig"
 link_file "$DOTFILES_DIR/rg/.ripgreprc" "$HOME/.ripgreprc"
 
 echo "Installation complete!"
-if [ "$OS" == "Darwin" ]; then
-    echo "Please restart your terminal or run: source ~/.zshrc"
-else
-    echo "Please restart your terminal or run: source ~/.bashrc (or ~/.zshrc if using zsh)"
-fi
+echo "Please restart your terminal or run: source ~/.zshrc"
 echo "Note: If NVM was installed, you may need to restart your terminal."

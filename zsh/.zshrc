@@ -1,5 +1,18 @@
 # .zshrc
 
+# Enable Powerlevel10k instant prompt. Should stay close to the top.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# Oh My Zsh
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="powerlevel10k/powerlevel10k"
+plugins=(git)
+if [ -s "$ZSH/oh-my-zsh.sh" ]; then
+    source "$ZSH/oh-my-zsh.sh"
+fi
+
 # Basic settings
 HISTSIZE=10000
 SAVEHIST=10000
@@ -64,12 +77,17 @@ export EDITOR='nvim'
 export VISUAL='nvim'
 export PATH=$HOME/bin:$HOME/.local/bin:$PATH
 
-# Initialize Starship
-if command -v starship &> /dev/null; then
-    eval "$(starship init zsh)"
-fi
+# Powerlevel10k config
+[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
 
 # Source local config if it exists
 if [ -f ~/.zshrc_local ]; then
     . ~/.zshrc_local
 fi
+
+# bun completions
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
